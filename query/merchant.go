@@ -1,0 +1,43 @@
+package query
+
+import (
+	"context"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/jackyang-hk/go-tools/utility"
+	"strings"
+	"unibee-merchant-auth/bean"
+	"unibee-merchant-auth/jwt"
+)
+
+func GetMerchantByApiKey(ctx context.Context, apiKey string) (one *bean.Merchant) {
+	if len(apiKey) <= 0 {
+		return nil
+	}
+	idData, err := g.Redis().Get(ctx, jwt.GetOpenApiKeyRedisKey(apiKey))
+	if err != nil {
+		return nil
+	}
+	data, err := g.Redis().Get(ctx, "UniBee#AllMerchants")
+	if err != nil {
+		return nil
+	}
+	var list []*bean.Merchant
+	err = utility.UnmarshalFromJsonString(data.String(), &list)
+	if err != nil {
+		return nil
+	}
+
+	for _, merchant := range list {
+		if idData != nil && idData.Uint64() > 0 {
+			if merchant.Id == idData.Uint64() {
+				one = merchant
+				break
+			}
+		}
+		if strings.Compare(merchant.ApiKey, apiKey) == 0 {
+			one = merchant
+			break
+		}
+	}
+	return nil
+}
