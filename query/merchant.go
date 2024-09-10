@@ -2,11 +2,11 @@ package query
 
 import (
 	"context"
+	"github.com/UniBee-Billing/unibee-merchant-auth/bean"
+	"github.com/UniBee-Billing/unibee-merchant-auth/jwt"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/jackyang-hk/go-tools/utility"
 	"strings"
-	"unibee-merchant-auth/bean"
-	"unibee-merchant-auth/jwt"
 )
 
 func GetMerchantByApiKey(ctx context.Context, apiKey string) (one *bean.Merchant) {

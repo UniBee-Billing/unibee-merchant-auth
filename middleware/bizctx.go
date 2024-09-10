@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"context"
+	"github.com/UniBee-Billing/unibee-merchant-auth/middleware/model"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
-	"unibee-merchant-auth/middleware/model"
 )
 
 type IContext interface {

@@ -1,4 +1,4 @@
-module unibee-merchant-auth
+module github.com/UniBee-Billing/unibee-merchant-auth
 
 go 1.21
 

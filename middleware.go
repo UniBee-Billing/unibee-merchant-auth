@@ -3,6 +3,11 @@ package unibee_merchant_auth
 import (
 	"context"
 	"fmt"
+	"github.com/UniBee-Billing/unibee-merchant-auth/i18n"
+	"github.com/UniBee-Billing/unibee-merchant-auth/jwt"
+	"github.com/UniBee-Billing/unibee-merchant-auth/middleware"
+	"github.com/UniBee-Billing/unibee-merchant-auth/middleware/model"
+	"github.com/UniBee-Billing/unibee-merchant-auth/query"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
@@ -12,11 +17,6 @@ import (
 	"github.com/jackyang-hk/go-tools/utility"
 	"strconv"
 	"strings"
-	"unibee-merchant-auth/i18n"
-	"unibee-merchant-auth/jwt"
-	"unibee-merchant-auth/middleware"
-	"unibee-merchant-auth/middleware/model"
-	"unibee-merchant-auth/query"
 )
 
 var loginUrl = "/login"

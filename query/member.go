@@ -2,9 +2,9 @@ package query
 
 import (
 	"context"
+	"github.com/UniBee-Billing/unibee-merchant-auth/bean"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/jackyang-hk/go-tools/utility"
-	"unibee-merchant-auth/bean"
 )
 
 func GetMerchantMemberById(ctx context.Context, id uint64) (one *bean.MerchantMember) {
