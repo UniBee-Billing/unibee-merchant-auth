@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"fmt"
 	"github.com/UniBee-Billing/unibee-merchant-auth/bean"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/jackyang-hk/go-tools/utility"
@@ -11,21 +12,13 @@ func GetMerchantMemberById(ctx context.Context, id uint64) (one *bean.MerchantMe
 	if id <= 0 {
 		return nil
 	}
-	data, err := g.Redis().Get(ctx, "UniBee#AllMembers")
+	data, err := g.Redis().Get(ctx, fmt.Sprintf("UniBee#Member#%d", id))
 	if err != nil {
 		return nil
 	}
-	var list []*bean.MerchantMember
-	err = utility.UnmarshalFromJsonString(data.String(), &list)
+	err = utility.UnmarshalFromJsonString(data.String(), &one)
 	if err != nil {
 		return nil
-	}
-
-	for _, member := range list {
-		if member.Id == id {
-			one = member
-			break
-		}
 	}
 
 	return one
