@@ -36,7 +36,7 @@ func GetMerchantByApiKey(ctx context.Context, apiKey string) (one *bean.Merchant
 			break
 		}
 	}
-	return nil
+	return one
 }
 
 func GetMerchantById(ctx context.Context, id uint64) (one *bean.Merchant) {
@@ -56,5 +56,5 @@ func GetMerchantById(ctx context.Context, id uint64) (one *bean.Merchant) {
 			break
 		}
 	}
-	return nil
+	return one
 }
