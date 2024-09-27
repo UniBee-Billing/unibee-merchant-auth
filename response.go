@@ -20,7 +20,7 @@ func portalJson(r *ghttp.Request, code int, message string, data ...interface{})
 	} else {
 		responseData = g.Map{}
 	}
-	//requestId := Context().GetUniBeeContext(r.Context()).RequestId
+	//requestId := Context().Get(r.Context()).RequestId
 	responseJson := JsonRes{
 		Code:    code,
 		Message: message,
@@ -46,7 +46,7 @@ func JsonRedirect(r *ghttp.Request, code int, message, redirect string, data ...
 	if len(data) > 0 {
 		responseData = data[0]
 	}
-	//requestId := Context().GetUniBeeContext(r.Context()).RequestId
+	//requestId := Context().Get(r.Context()).RequestId
 	responseJson := JsonRes{
 		Code:     code,
 		Message:  message,

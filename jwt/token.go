@@ -17,7 +17,7 @@ const (
 	TOKENTYPEMERCHANTMember = "MERCHANT_MEMBER"
 )
 
-var jwtKey = "changeme"
+var jwtKey = "3^&secret-key-for-UniBee*1!8*"
 var env = ""
 
 func SetupJwtToken(_env string, _jwtKey string) {

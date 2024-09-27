@@ -1,6 +1,8 @@
 package unibee_merchant_auth
 
 import (
+	"context"
+	"github.com/UniBee-Billing/unibee-merchant-auth/bean"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/golang-jwt/jwt/v5"
@@ -36,7 +38,8 @@ type UniBeeContext struct {
 	Session        *ghttp.Session
 	MerchantId     uint64
 	User           *UniBeeContextUser
-	MerchantMember *UniBeeContextMerchantMember
+	MerchantMember *bean.MerchantMember
+	Merchant       *bean.Merchant
 	RequestId      string
 	Data           g.Map
 	OpenApiConfig  *OpenApiConfig
@@ -63,4 +66,25 @@ type UniBeeContextMerchantMember struct {
 	Token      string
 	Email      string
 	IsOwner    bool
+}
+
+func GetUniBeeMerchantId(ctx context.Context) uint64 {
+	if Context().Get(ctx) == nil {
+		panic(SystemAssertPrefix + "Context Not Found")
+	}
+	if Context().Get(ctx).MerchantId <= 0 {
+		panic(SystemAssertPrefix + "Invalid Merchant")
+	}
+	return Context().Get(ctx).MerchantId
+}
+
+func GetUniBeeContext(ctx context.Context) *UniBeeContext {
+	value := ctx.Value(ContextKey)
+	if value == nil {
+		return nil
+	}
+	if localCtx, ok := value.(*UniBeeContext); ok {
+		return localCtx
+	}
+	return nil
 }
