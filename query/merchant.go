@@ -14,9 +14,6 @@ func GetMerchantByApiKey(ctx context.Context, apiKey string) (one *bean.Merchant
 		return nil
 	}
 	idData, err := g.Redis().Get(ctx, jwt.GetOpenApiKeyRedisKey(apiKey))
-	if err != nil {
-		return nil
-	}
 	data, err := g.Redis().Get(ctx, "UniBee#AllMerchants")
 	if err != nil {
 		return nil

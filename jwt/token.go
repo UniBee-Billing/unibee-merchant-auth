@@ -16,8 +16,8 @@ const (
 	TOKENTYPEMERCHANTMember = "MERCHANT_MEMBER"
 )
 
-var jwtKey = "3^&secret-key-for-UniBee*1!8*"
-var env = ""
+var Key = "3^&secret-key-for-UniBee*1!8*"
+var Env = ""
 
 type TokenType string
 
@@ -31,20 +31,15 @@ type TokenClaims struct {
 	jwt.RegisteredClaims
 }
 
-func SetupJwtToken(_env string, _jwtKey string) {
-	jwtKey = _jwtKey
-	env = _env
-}
-
 func IsPortalToken(token string) bool {
 	return strings.HasPrefix(token, TOKEN_PREFIX)
 }
 
 func ParsePortalToken(accessToken string) *TokenClaims {
-	utility.Assert(len(jwtKey) > 0, "server error: tokenKey is nil")
+	utility.Assert(len(Key) > 0, "server error: tokenKey is nil")
 	accessToken = strings.Replace(accessToken, TOKEN_PREFIX, "", 1)
 	parsedAccessToken, _ := jwt.ParseWithClaims(accessToken, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(jwtKey), nil
+		return []byte(Key), nil
 	})
 	return parsedAccessToken.Claims.(*TokenClaims)
 }
@@ -55,7 +50,7 @@ func GetMemberPermissionKey(one *bean.MerchantMember) string {
 }
 
 func getAuthTokenRedisKey(token string) string {
-	return fmt.Sprintf("auth#%s#%s", env, token)
+	return fmt.Sprintf("auth#%s#%s", Env, token)
 }
 
 func IsAuthTokenAvailable(ctx context.Context, token string) bool {
@@ -70,5 +65,5 @@ func IsAuthTokenAvailable(ctx context.Context, token string) bool {
 }
 
 func GetOpenApiKeyRedisKey(token string) string {
-	return fmt.Sprintf("openApiKey#%s#%s", env, token)
+	return fmt.Sprintf("openApiKey#%s#%s", Env, token)
 }

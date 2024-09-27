@@ -76,3 +76,8 @@ func GetUniBeeContext(ctx context.Context) *UniBeeContext {
 	}
 	return nil
 }
+
+func Setup(_env string, _jwtKey string) {
+	jwt.Key = _jwtKey
+	jwt.Env = _env
+}
