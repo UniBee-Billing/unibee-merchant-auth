@@ -3,22 +3,10 @@ package unibee_merchant_auth
 import (
 	"context"
 	"github.com/UniBee-Billing/unibee-merchant-auth/bean"
+	"github.com/UniBee-Billing/unibee-merchant-auth/jwt"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/golang-jwt/jwt/v5"
 )
-
-type TokenType string
-
-type TokenClaims struct {
-	TokenType     TokenType `json:"tokenType"`
-	Id            uint64    `json:"id"`
-	Email         string    `json:"email"`
-	MerchantId    uint64    `json:"merchantId"`
-	PermissionKey string    `json:"permissionKey"`
-	Lang          string    `json:"lang"`
-	jwt.RegisteredClaims
-}
 
 type OpenApiConfig struct {
 	Id                      uint64 `json:"id"                      description:""`                         //
@@ -49,7 +37,7 @@ type UniBeeContext struct {
 	UserAgent      string
 	Authorization  string
 	TokenString    string
-	Token          *TokenClaims
+	Token          *jwt.TokenClaims
 }
 
 type UniBeeContextUser struct {
