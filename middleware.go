@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"github.com/UniBee-Billing/unibee-merchant-auth/i18n"
 	"github.com/UniBee-Billing/unibee-merchant-auth/jwt"
-	"github.com/UniBee-Billing/unibee-merchant-auth/middleware"
-	"github.com/UniBee-Billing/unibee-merchant-auth/middleware/model"
 	"github.com/UniBee-Billing/unibee-merchant-auth/query"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
@@ -31,14 +29,14 @@ func CORS(r *ghttp.Request) {
 }
 
 func ResponseHandler(r *ghttp.Request) {
-	customCtx := &model.Context{
+	customCtx := &UniBeeContext{
 		Session: r.Session,
 		Data:    make(g.Map),
 	}
 	customCtx.RequestId = utility.CreateRequestId()
-	middleware.Context().Init(r, customCtx)
+	Context().Init(r, customCtx)
 	r.Assigns(g.Map{
-		middleware.ContextKey: customCtx,
+		ContextKey: customCtx,
 	})
 
 	// Setup System Default Language
@@ -90,54 +88,54 @@ func ResponseHandler(r *ghttp.Request) {
 			code = gcode.CodeInternalError
 		}
 		json, _ := r.GetJson()
-		g.Log().Errorf(r.Context(), "Global_exception requestId:%s url: %s params:%s code:%d error:%s", middleware.Context().Get(r.Context()).RequestId, r.GetUrl(), json, code.Code(), err.Error())
+		g.Log().Errorf(r.Context(), "Global_exception requestId:%s url: %s params:%s code:%d error:%s", Context().GetUniBeeContext(r.Context()).RequestId, r.GetUrl(), json, code.Code(), err.Error())
 		r.Response.ClearBuffer() // inner panic will contain json data，need clean
 
 		message := err.Error()
 		if strings.Contains(message, "Session Expired") {
 			if customCtx.IsOpenApiCall {
 				r.Response.Status = 400
-				middleware.OpenApiJsonExit(r, gcode.CodeValidationFailed.Code(), "Session Expired")
+				OpenApiJsonExit(r, gcode.CodeValidationFailed.Code(), "Session Expired")
 			} else {
 				r.Response.Status = 200 // error reply in json code, http code always 200
-				middleware.JsonRedirectExit(r, 61, "Session Expired", loginUrl)
+				JsonRedirectExit(r, 61, "Session Expired", loginUrl)
 			}
 		} else if strings.Contains(message, utility.SystemAssertPrefix) || code == gcode.CodeValidationFailed {
 			if customCtx.IsOpenApiCall {
 				r.Response.Status = 400
-				middleware.OpenApiJsonExit(r, gcode.CodeValidationFailed.Code(), strings.Replace(message, "exception recovered: "+utility.SystemAssertPrefix, "", 1))
+				OpenApiJsonExit(r, gcode.CodeValidationFailed.Code(), strings.Replace(message, "exception recovered: "+utility.SystemAssertPrefix, "", 1))
 			} else {
 				r.Response.Status = 200 // error reply in json code, http code always 200
-				middleware.JsonExit(r, gcode.CodeValidationFailed.Code(), strings.Replace(message, "exception recovered: "+utility.SystemAssertPrefix, "", 1))
+				JsonExit(r, gcode.CodeValidationFailed.Code(), strings.Replace(message, "exception recovered: "+utility.SystemAssertPrefix, "", 1))
 			}
 		} else {
 			if customCtx.IsOpenApiCall {
 				r.Response.Status = 400
-				middleware.OpenApiJsonExit(r, code.Code(), fmt.Sprintf("Server Error-%s-%d", Get(r.Context()).RequestId, code.Code()))
+				OpenApiJsonExit(r, code.Code(), fmt.Sprintf("Server Error-%s-%d", Get(r.Context()).RequestId, code.Code()))
 			} else {
 				r.Response.Status = 200 // error reply in json code, http code always 200
-				middleware.JsonExit(r, code.Code(), fmt.Sprintf("Server Error-%s-%d", Get(r.Context()).RequestId, code.Code()))
+				JsonExit(r, code.Code(), fmt.Sprintf("Server Error-%s-%d", Get(r.Context()).RequestId, code.Code()))
 			}
 		}
 	} else {
 		r.Response.Status = 200
 		if customCtx.IsOpenApiCall {
-			middleware.OpenApiJsonExit(r, code.Code(), "", res)
+			OpenApiJsonExit(r, code.Code(), "", res)
 		} else {
-			middleware.JsonExit(r, code.Code(), "", res)
+			JsonExit(r, code.Code(), "", res)
 		}
 	}
 }
 
 func MerchantHandler(r *ghttp.Request) {
-	customCtx := middleware.Context().Get(r.Context())
+	customCtx := Context().GetUniBeeContext(r.Context())
 	if len(customCtx.TokenString) == 0 {
 		g.Log().Infof(r.Context(), "MerchantHandler empty token string of auth header")
 		if customCtx.IsOpenApiCall {
 			r.Response.Status = 401
-			middleware.OpenApiJsonExit(r, 61, "invalid token")
+			OpenApiJsonExit(r, 61, "invalid token")
 		} else {
-			middleware.JsonRedirectExit(r, 61, "invalid token", loginUrl)
+			JsonRedirectExit(r, 61, "invalid token", loginUrl)
 		}
 		r.Exit()
 	}
@@ -145,7 +143,7 @@ func MerchantHandler(r *ghttp.Request) {
 		// Merchant Portal Call
 		if !jwt.IsAuthTokenAvailable(r.Context(), customCtx.TokenString) {
 			g.Log().Infof(r.Context(), "MerchantHandler Invalid Token:%s", customCtx.TokenString)
-			middleware.JsonRedirectExit(r, 61, "invalid token", loginUrl)
+			JsonRedirectExit(r, 61, "invalid token", loginUrl)
 			r.Exit()
 		}
 
@@ -157,19 +155,19 @@ func MerchantHandler(r *ghttp.Request) {
 			permissionKey := jwt.GetMemberPermissionKey(member)
 			if member == nil {
 				g.Log().Infof(r.Context(), "MerchantHandler merchant member not found token:%s", utility.MarshalToJsonString(customCtx.Token))
-				middleware.JsonRedirectExit(r, 61, "merchant user not found", loginUrl)
+				JsonRedirectExit(r, 61, "merchant user not found", loginUrl)
 				r.Exit()
 			} else if member.Status == 2 {
 				g.Log().Infof(r.Context(), "MerchantHandler merchant member has suspend :%v", utility.MarshalToJsonString(customCtx.Token))
-				middleware.JsonRedirectExit(r, 61, "Your account has been suspended. Please contact billing admin for further assistance.", loginUrl)
+				JsonRedirectExit(r, 61, "Your account has been suspended. Please contact billing admin for further assistance.", loginUrl)
 				r.Exit()
 			} else if strings.Compare(permissionKey, customCtx.Token.PermissionKey) != 0 && !strings.Contains(r.GetUrl(), "logout") {
 				g.Log().Infof(r.Context(), "MerchantHandler merchant member permission has change, need reLogin")
-				middleware.JsonRedirectExit(r, 62, "Your permission has changed. Please reLogin.", loginUrl)
+				JsonRedirectExit(r, 62, "Your permission has changed. Please reLogin.", loginUrl)
 				r.Exit()
 			}
 
-			customCtx.MerchantMember = &model.ContextMerchantMember{
+			customCtx.MerchantMember = &UniBeeContextMerchantMember{
 				Id:         customCtx.Token.Id,
 				MerchantId: customCtx.Token.MerchantId,
 				Token:      customCtx.TokenString,
@@ -190,7 +188,7 @@ func MerchantHandler(r *ghttp.Request) {
 			}
 		} else {
 			g.Log().Infof(r.Context(), "MerchantHandler invalid token type token:%v", utility.MarshalToJsonString(customCtx.Token))
-			middleware.JsonRedirectExit(r, 61, "invalid token type", loginUrl)
+			JsonRedirectExit(r, 61, "invalid token type", loginUrl)
 			r.Exit()
 		}
 	} else {
@@ -199,7 +197,7 @@ func MerchantHandler(r *ghttp.Request) {
 		merchantInfo := query.GetMerchantByApiKey(r.Context(), customCtx.TokenString)
 		if merchantInfo == nil {
 			r.Response.Status = 401
-			middleware.OpenApiJsonExit(r, 61, "invalid token")
+			OpenApiJsonExit(r, 61, "invalid token")
 		} else {
 			customCtx.MerchantId = merchantInfo.Id
 			customCtx.OpenApiKey = customCtx.TokenString
@@ -230,12 +228,12 @@ func doubleRequestLimit(id string, r *ghttp.Request) {
 	}
 }
 
-func Get(ctx context.Context) *model.Context {
-	value := ctx.Value(middleware.ContextKey)
+func Get(ctx context.Context) *UniBeeContext {
+	value := ctx.Value(ContextKey)
 	if value == nil {
 		return nil
 	}
-	if localCtx, ok := value.(*model.Context); ok {
+	if localCtx, ok := value.(*UniBeeContext); ok {
 		return localCtx
 	}
 	return nil

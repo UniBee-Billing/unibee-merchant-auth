@@ -3,8 +3,8 @@ package jwt
 import (
 	"context"
 	"fmt"
+	"github.com/UniBee-Billing/unibee-merchant-auth"
 	"github.com/UniBee-Billing/unibee-merchant-auth/bean"
-	"github.com/UniBee-Billing/unibee-merchant-auth/middleware/model"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackyang-hk/go-tools/utility"
@@ -29,13 +29,13 @@ func IsPortalToken(token string) bool {
 	return strings.HasPrefix(token, TOKEN_PREFIX)
 }
 
-func ParsePortalToken(accessToken string) *model.TokenClaims {
+func ParsePortalToken(accessToken string) *unibee_merchant_auth.TokenClaims {
 	utility.Assert(len(jwtKey) > 0, "server error: tokenKey is nil")
 	accessToken = strings.Replace(accessToken, TOKEN_PREFIX, "", 1)
-	parsedAccessToken, _ := jwt.ParseWithClaims(accessToken, &model.TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+	parsedAccessToken, _ := jwt.ParseWithClaims(accessToken, &unibee_merchant_auth.TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(jwtKey), nil
 	})
-	return parsedAccessToken.Claims.(*model.TokenClaims)
+	return parsedAccessToken.Claims.(*unibee_merchant_auth.TokenClaims)
 }
 
 func GetMemberPermissionKey(one *bean.MerchantMember) string {

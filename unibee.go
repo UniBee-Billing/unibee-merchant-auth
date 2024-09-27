@@ -1,4 +1,4 @@
-package model
+package unibee_merchant_auth
 
 import (
 	"github.com/gogf/gf/v2/frame/g"
@@ -32,11 +32,11 @@ type OpenApiConfig struct {
 	CompanyId               int64  `json:"companyId"               description:"company id"`               // company id
 }
 
-type Context struct {
+type UniBeeContext struct {
 	Session        *ghttp.Session
 	MerchantId     uint64
-	User           *ContextUser
-	MerchantMember *ContextMerchantMember
+	User           *UniBeeContextUser
+	MerchantMember *UniBeeContextMerchantMember
 	RequestId      string
 	Data           g.Map
 	OpenApiConfig  *OpenApiConfig
@@ -49,7 +49,7 @@ type Context struct {
 	Token          *TokenClaims
 }
 
-type ContextUser struct {
+type UniBeeContextUser struct {
 	Id         uint64
 	MerchantId uint64
 	Token      string
@@ -57,7 +57,7 @@ type ContextUser struct {
 	Lang       string
 }
 
-type ContextMerchantMember struct {
+type UniBeeContextMerchantMember struct {
 	Id         uint64
 	MerchantId uint64
 	Token      string

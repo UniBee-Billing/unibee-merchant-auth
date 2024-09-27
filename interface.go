@@ -1,17 +1,16 @@
-package middleware
+package unibee_merchant_auth
 
 import (
 	"context"
-	"github.com/UniBee-Billing/unibee-merchant-auth/middleware/model"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 )
 
 type IContext interface {
-	Init(r *ghttp.Request, customCtx *model.Context)
-	Get(ctx context.Context) *model.Context
-	SetUser(ctx context.Context, ctxUser *model.ContextUser)
-	SetMerchantMember(ctx context.Context, ctxMerchantMember *model.ContextMerchantMember)
+	Init(r *ghttp.Request, customCtx *UniBeeContext)
+	GetUniBeeContext(ctx context.Context) *UniBeeContext
+	SetUser(ctx context.Context, ctxUser *UniBeeContextUser)
+	SetMerchantMember(ctx context.Context, ctxMerchantMember *UniBeeContextMerchantMember)
 	SetData(ctx context.Context, data g.Map)
 }
 
@@ -29,10 +28,13 @@ const (
 )
 
 func GetMerchantId(ctx context.Context) uint64 {
-	if Context().Get(ctx).MerchantId <= 0 {
+	if Context().GetUniBeeContext(ctx) == nil {
+		panic(SystemAssertPrefix + "Context Not Found")
+	}
+	if Context().GetUniBeeContext(ctx).MerchantId <= 0 {
 		panic(SystemAssertPrefix + "Invalid Merchant")
 	}
-	return Context().Get(ctx).MerchantId
+	return Context().GetUniBeeContext(ctx).MerchantId
 }
 
 func RegisterContext(i IContext) {
