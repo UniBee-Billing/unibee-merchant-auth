@@ -58,3 +58,15 @@ func GetMerchantById(ctx context.Context, id uint64) (one *bean.Merchant) {
 	}
 	return one
 }
+
+func GetAllMerchants(ctx context.Context) (list []*bean.Merchant) {
+	data, err := g.Redis().Get(ctx, "UniBee#AllMerchants")
+	if err != nil {
+		return nil
+	}
+	err = utility.UnmarshalFromJsonString(data.String(), &list)
+	if err != nil {
+		return nil
+	}
+	return list
+}
